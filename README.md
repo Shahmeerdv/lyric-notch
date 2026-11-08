@@ -25,7 +25,7 @@ You need:
 - Visual Studio Build Tools with the **Desktop development with C++** workload
 
 ```bash
-git clone https://github.com/<your-username>/lyric-notch.git
+git clone https://github.com/Shahmeerdv/lyric-notch.git
 cd lyric-notch
 npm install
 npm run tauri dev      # run in development
