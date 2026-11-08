@@ -11,7 +11,7 @@ A floating, Dynamic Island style notch for Windows that shows the synced lyrics 
 
 ### Option 1: installer (recommended)
 
-1. Open the [Releases](../../releases) page and download `Lyric Notch_x.y.z_x64-setup.exe`.
+1. Open the [Releases](../../releases) page and download `Lyric-Notch_x.y.z_x64-setup.exe`.
 2. Run it. Windows SmartScreen may warn that the app is from an unknown publisher, because the installer is not code-signed. Choose **More info**, then **Run anyway**.
 3. Start **Lyric Notch** from the Start menu, then play a song in Spotify.
 
