@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lyric Notch dim</title>
+    <style>
+      /* Full-screen dim layer. Mouse clicks pass through (set in Rust); the notch window sits above it. */
+      html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+      body { background: rgba(0, 0, 0, var(--dim, 0.6)); transition: background 0.3s; }
+    </style>
+    <script>
+      // Level is shared with the notch window through localStorage (same origin).
+      const apply = () => {
+        let v = 0.6;
+        try { v = Number(localStorage.getItem("dim") || 0.6) || 0.6; } catch {}
+        document.documentElement.style.setProperty("--dim", String(v));
+      };
+      apply();
+      window.addEventListener("storage", apply);
+    </script>
+  </head>
+  <body></body>
+</html>

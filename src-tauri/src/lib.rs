@@ -69,6 +69,50 @@ fn set_window_size(window: tauri::WebviewWindow, width: f64, height: f64) {
     }
 }
 
+/// Dim the whole primary monitor except the notch. level 0 removes the dim layer.
+/// Async because creating a window from a sync command can deadlock on Windows.
+#[tauri::command]
+async fn set_dim(app: tauri::AppHandle, level: f64) -> Result<(), String> {
+    let main = app.get_webview_window("main").ok_or("no main window")?;
+    if level <= 0.0 {
+        if let Some(w) = app.get_webview_window("dim") {
+            w.close().map_err(|e| e.to_string())?;
+        }
+        return Ok(());
+    }
+    let dim = match app.get_webview_window("dim") {
+        Some(w) => w,
+        None => {
+            let mon = main.primary_monitor().map_err(|e| e.to_string())?.ok_or("no monitor")?;
+            let scale = mon.scale_factor();
+            let size = mon.size().to_logical::<f64>(scale);
+            let pos = mon.position().to_logical::<f64>(scale);
+            let w = tauri::WebviewWindowBuilder::new(&app, "dim", tauri::WebviewUrl::App("dim.html".into()))
+                .title("Lyric Notch dim")
+                .decorations(false)
+                .transparent(true)
+                .shadow(false)
+                .always_on_top(true)
+                .skip_taskbar(true)
+                .focused(false)
+                .resizable(false)
+                .inner_size(size.width, size.height)
+                .position(pos.x, pos.y)
+                .build()
+                .map_err(|e| e.to_string())?;
+            // Clicks and typing go straight through to the apps underneath.
+            w.set_ignore_cursor_events(true).map_err(|e| e.to_string())?;
+            w
+        }
+    };
+    // The page also reads the level from localStorage on load; this updates an already-open layer.
+    let _ = dim.eval(&format!("document.documentElement.style.setProperty('--dim','{level}')"));
+    // Re-assert topmost so the notch sits above the dim layer.
+    let _ = main.set_always_on_top(false);
+    let _ = main.set_always_on_top(true);
+    Ok(())
+}
+
 #[tauri::command]
 fn quit(app: tauri::AppHandle) {
     app.exit(0);
@@ -165,7 +209,7 @@ fn read_spotify(cache: &mut ArtCache, store: &ArtStore) -> windows::core::Result
 pub fn run() {
     tauri::Builder::default()
         .manage(ArtStore::default())
-        .invoke_handler(tauri::generate_handler![get_art, quit, media_control, set_window_size])
+        .invoke_handler(tauri::generate_handler![get_art, quit, media_control, set_window_size, set_dim])
         .setup(|app| {
             // Center window at top edge of primary monitor.
             if let Some(win) = app.get_webview_window("main") {

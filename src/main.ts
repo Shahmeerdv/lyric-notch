@@ -28,7 +28,7 @@ const winW = () => BASE_W * size;
 const FLOAT_GAP = 12; // px between screen top and the floating notch
 const gap = () => (pref("float") ? FLOAT_GAP : 0);
 const winH = () => BASE_H * size + gap();
-const menuWinH = () => Math.max(400, 148 * size + 335 + gap());
+const menuWinH = () => Math.max(400, 148 * size + 395 + gap());
 const resizeWindow = (menu: boolean) => invoke("set_window_size", { width: winW(), height: menu ? menuWinH() : winH() });
 const applySize = () => { notch.style.zoom = String(size); resizeWindow(menuOpen); };
 
@@ -41,7 +41,16 @@ let theme = localStorage.getItem("theme") ?? "auto";
 const applyAccent = () => document.documentElement.style.setProperty("--accent", theme === "auto" ? coverAccent : theme);
 applyAccent();
 
+// ---- Dim screen: a click-through dark layer behind the notch (0 = off) ----
+let dim = Number(localStorage.getItem("dimLevel") ?? 0);
+const applyDim = () => {
+  if (dim > 0) localStorage.setItem("dim", String(dim)); // read by dim.html
+  invoke("set_dim", { level: dim }).catch(() => {});
+};
+if (dim > 0) applyDim();
+
 const syncMenu = () => {
+  menuEl.querySelectorAll<HTMLElement>("[data-dim]").forEach((el) => el.classList.toggle("on", Number(el.dataset.dim) === dim));
   menuEl.querySelectorAll<HTMLElement>("[data-theme]").forEach((el) => el.classList.toggle("on", el.dataset.theme === theme));
   menuEl.querySelectorAll<HTMLElement>("[data-size]").forEach((el) => el.classList.toggle("on", Number(el.dataset.size) === size));
   leadVal.textContent = `${leadMs} ms`;
@@ -74,8 +83,14 @@ $("scrim").addEventListener("mousedown", closeMenu);
 applySize();
 
 menuEl.addEventListener("click", (e) => {
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-act],[data-pref],[data-size],[data-theme]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-act],[data-pref],[data-size],[data-theme],[data-dim]");
   if (!el) return;
+  if (el.dataset.dim !== undefined) {
+    dim = Number(el.dataset.dim);
+    localStorage.setItem("dimLevel", String(dim));
+    applyDim(); syncMenu();
+    return;
+  }
   if (el.dataset.theme) {
     theme = el.dataset.theme;
     localStorage.setItem("theme", theme);
