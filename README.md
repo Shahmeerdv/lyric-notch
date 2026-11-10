@@ -6,6 +6,7 @@ A floating, Dynamic Island style notch for Windows that shows the synced lyrics 
 - **Hover for more.** Album cover, title, artist, previous / current / next lines, a progress bar, and previous / play-pause / next buttons.
 - **Looks the part.** Spinning vinyl cover, equalizer bars, and a glow that takes its color from the album art (or a fixed color you pick).
 - **Right-click settings.** Lyric sync offset, size (S / M / L), color, floating on/off, glow on/off, spinning cover, equalizer bars.
+- **Dim screen.** Darken everything except the notch (40% / 60% / 80%). Clicks still go through to your apps.
 
 ## Install
 
@@ -39,6 +40,7 @@ npm run tauri build    # build the installer into src-tauri/target/release/bundl
 | Play a song in Spotify | The pill appears and shows the current lyric line |
 | Hover the notch | Expands with cover, title, artist, nearby lines and playback buttons |
 | Right-click the notch | Opens the settings tiles |
+| **Dim screen** tile | Darkens the rest of the screen; the notch stays bright |
 | **Close Lyric Notch** tile | Quits the app |
 
 If lyrics feel early or late, use the **Lyric sync** stepper in the right-click menu. Positive values show lines earlier.
@@ -54,6 +56,7 @@ If lyrics feel early or late, use the **Lyric sync** stepper in the right-click 
 - Spotify desktop app only (Windows). Spotify in a browser is not detected.
 - If a song has no synced lyrics on LRCLIB, only the title and artist are shown.
 - The transparent area around the notch captures mouse clicks.
+- Dim screen covers the primary monitor only.
 - The installer is unsigned, so Windows shows a SmartScreen warning.
 
 ## Troubleshooting

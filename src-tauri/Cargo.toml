@@ -1,6 +1,6 @@
 [package]
 name = "lyric-notch"
-version = "0.1.0"
+version = "0.2.0"
 description = "Floating notch for Windows that shows synced Spotify lyrics"
 authors = ["Shahmeer"]
 edition = "2024"
